@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: validating-webhook
+  namespace: webhooktest
+  labels:
+    app: validating-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: validating-webhook
+  template:
+    metadata:
+      labels:
+        app: validating-webhook
+    spec:
+      containers:
+        - name: validating-webhook
+          image: msgtonaveen/validating-admission-controller:v0.1.0
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/ssl/certs
+              readOnly: true
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: validating-webhook-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: validating-webhook-svc
+  namespace: webhooktest
+spec:
+  type: ClusterIP
+  selector:
+    app: validating-webhook
+  ports:
+    - port: 443
+      targetPort: 7443

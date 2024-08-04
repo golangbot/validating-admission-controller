@@ -1,0 +1,26 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: deployment-resource-validation
+webhooks:
+  - name: "memoryvalidation.webhook.local"
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values: ["webhooktest"]
+    rules:
+      - operations: ["CREATE","UPDATE"]
+        apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        resources: ["deployments"]
+    clientConfig:
+      service:
+        namespace: webhooktest
+        name: validating-webhook-svc
+        path: "/validate"
+      caBundle: $CA_CERT_BASE64
+    admissionReviewVersions: ["v1"]
+    timeoutSeconds: 5
+    sideEffects: None
+    failurePolicy: Fail

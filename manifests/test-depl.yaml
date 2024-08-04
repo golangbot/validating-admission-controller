@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: test-dep
+  name: test-dep
+  namespace: webhooktest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-dep
+  template:
+    metadata:
+      labels:
+        app: test-dep
+    spec:
+      containers:
+      - image: busybox
+        name: busybox
+        command: [ "sleep" ]
+        args: [ "infinity" ]
+        resources:
+          requests:
+            memory: 20Mi
+          limits:
+            memory: 50Mi
